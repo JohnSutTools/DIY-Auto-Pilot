@@ -16,10 +16,18 @@ import yaml
 # Openpilot imports
 try:
     import os
-    print(f"DEBUG: sys.path = {sys.path[:3]}...")
-    print(f"DEBUG: PYTHONPATH = {os.environ.get('PYTHONPATH', 'NOT SET')}")
-    import cereal.messaging as messaging
-    print("DEBUG: cereal imported successfully!")
+    import platform
+    
+    # Check if running on ARMv7 (Pi 2) - openpilot doesn't support 32-bit ARM
+    if platform.machine() == 'armv7l':
+        print("⚠️  Detected ARMv7 (32-bit ARM) - openpilot not supported")
+        print("   Using mock cereal for Pi 2 testing")
+        import bridge.mock_cereal_messaging as messaging
+    else:
+        print(f"DEBUG: sys.path = {sys.path[:3]}...")
+        print(f"DEBUG: PYTHONPATH = {os.environ.get('PYTHONPATH', 'NOT SET')}")
+        import cereal.messaging as messaging
+        print("DEBUG: cereal imported successfully!")
 except ImportError as e:
     print(f"ERROR: cereal not found. Install openpilot or cereal library.")
     print(f"DEBUG: Import error: {e}")
