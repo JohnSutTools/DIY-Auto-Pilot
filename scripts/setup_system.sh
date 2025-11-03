@@ -19,11 +19,12 @@ fi
 # Check Python version
 echo "Checking Python 3.8+..."
 python3 --version
-PYTHON_VERSION=$(python3 -c 'import sys; print(".".join(map(str, sys.version_info[:2])))')
-if (( $(echo "$PYTHON_VERSION < 3.8" | bc -l) )); then
-    echo "ERROR: Python 3.8+ required"
+PYTHON_VERSION=$(python3 -c 'import sys; print(sys.version_info.major * 100 + sys.version_info.minor)')
+if [ "$PYTHON_VERSION" -lt 308 ]; then
+    echo "ERROR: Python 3.8+ required (found version below 3.8)"
     exit 1
 fi
+echo "✓ Python version OK"
 
 # System dependencies
 echo ""

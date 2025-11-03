@@ -46,26 +46,44 @@ USB Webcam → Openpilot (LKAS only)
 - **Power**: 12V (from vehicle battery, fused)
 - **Vehicle**: 2018 Honda Civic RS (LKAS compatible)
 
-## Fresh Ubuntu Install? Start Here!
+## Quick Setup
 
-**Option 1: Automatic (Recommended)**
+### On Ubuntu / Raspberry Pi
+
+**🚀 One-Command Setup:**
 ```bash
-curl -fsSL https://raw.githubusercontent.com/JohnSutTools/DIY-Auto-Pilot/main/scripts/ubuntu_quick_setup.sh | bash
+bash <(curl -fsSL https://raw.githubusercontent.com/JohnSutTools/DIY-Auto-Pilot/main/scripts/ubuntu_quick_setup.sh)
 ```
 
-**Option 2: Manual**
+**Or Manual:**
 ```bash
 git clone https://github.com/JohnSutTools/DIY-Auto-Pilot.git ~/steering-actuator
 cd ~/steering-actuator
 ./scripts/setup_system.sh
-```
-
-**Then test in simulation (no hardware needed):**
-```bash
-./scripts/test_simulation.sh  # Select option 2
+./scripts/test_simulation.sh  # Test without hardware
 ```
 
 ➡️ **See [`docs/UBUNTU_SETUP.md`](docs/UBUNTU_SETUP.md) for complete walkthrough**
+
+### On Windows (Until You Get Your Pi)
+
+**Install WSL2 + Ubuntu** (PowerShell as Administrator):
+```powershell
+wsl --install -d Ubuntu-22.04
+```
+
+**Then in Ubuntu terminal:**
+```bash
+bash <(curl -fsSL https://raw.githubusercontent.com/JohnSutTools/DIY-Auto-Pilot/main/scripts/ubuntu_quick_setup.sh)
+```
+
+➡️ **See [`docs/WINDOWS_WSL_SETUP.md`](docs/WINDOWS_WSL_SETUP.md) for Windows-specific guide**
+
+**Advantages of WSL2 for development:**
+- ✅ Full Linux environment on Windows
+- ✅ USB device access (ESP32, webcam)
+- ✅ Same setup as Raspberry Pi
+- ✅ Easy migration when Pi arrives
 
 ## One-Command Setup
 
@@ -316,11 +334,17 @@ export PYTHONPATH="${PYTHONPATH}:~/openpilot"
 
 ## Documentation
 
+### Getting Started
 - **[`QUICKSTART.md`](QUICKSTART.md) - Start here for first-time setup** 🚀
-- **[`docs/TESTING.md`](docs/TESTING.md) - Complete testing guide (Ubuntu simulation)** 🧪
+- **[`docs/UBUNTU_SETUP.md`](docs/UBUNTU_SETUP.md) - Fresh Ubuntu install walkthrough** 🐧
+- **[`docs/WINDOWS_WSL_SETUP.md`](docs/WINDOWS_WSL_SETUP.md) - Run on Windows (WSL2)** 🪟
+- **[`docs/TESTING.md`](docs/TESTING.md) - Complete testing guide (simulation)** 🧪
+
+### System Details
 - [`docs/INTEGRATION.md`](docs/INTEGRATION.md) - How openpilot integrates
 - [`firmware/README.md`](firmware/README.md) - ESP32 setup, wiring, flashing
 - [`bridge/README.md`](bridge/README.md) - Bridge installation, usage, troubleshooting
+- [`docs/wiring.md`](docs/wiring.md) - Hardware wiring diagrams
 - [`project-overview.md`](project-overview.md) - Detailed system design and architecture
 - [`.github/copilot-instructions.md`](.github/copilot-instructions.md) - AI agent guidance
 

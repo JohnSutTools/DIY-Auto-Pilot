@@ -35,6 +35,8 @@ Building dependency tree... Done
 
 ## Step 2: Clone Repository
 
+**Copy and paste these commands one at a time:**
+
 ```bash
 # Navigate to home directory
 cd ~
@@ -47,6 +49,13 @@ cd steering-actuator
 
 # Verify files
 ls -la
+```
+
+**Alternative if you don't have git yet:**
+```bash
+sudo apt update
+sudo apt install -y git
+# Then run the clone command above
 ```
 
 **Expected output:**
