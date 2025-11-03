@@ -34,6 +34,14 @@ echo "==========================================="
 echo "Building Openpilot"
 echo "==========================================="
 
+# Activate the virtual environment that was just created
+echo "Activating openpilot virtual environment..."
+source .venv/bin/activate
+
+# Verify we're using the right Python
+echo "Using Python: $(which python3)"
+echo "Python version: $(python3 --version)"
+
 # Build openpilot
 echo "Building openpilot (this takes 10-15 minutes)..."
 scons -j$(nproc)
