@@ -17,10 +17,22 @@ echo "✓ System dependencies installed!"
 
 echo ""
 echo "==========================================="
-echo "Installing Openpilot Python Dependencies"
+echo "Initializing Openpilot Submodules"
 echo "==========================================="
 
 cd ~/openpilot
+
+# Initialize git submodules (rednose, panda, opendbc, etc.)
+echo "Initializing git submodules (rednose, panda, etc.)..."
+git submodule update --init --recursive
+
+echo ""
+echo "✓ Submodules initialized!"
+
+echo ""
+echo "==========================================="
+echo "Installing Openpilot Python Dependencies"
+echo "==========================================="
 
 # Install Python dependencies
 echo "Installing Python dependencies (this may take a few minutes)..."

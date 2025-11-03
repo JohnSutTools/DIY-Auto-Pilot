@@ -84,6 +84,10 @@ else
     git checkout release3
     
     echo ""
+    echo "Initializing submodules (rednose, panda, opendbc)..."
+    git submodule update --init --recursive
+    
+    echo ""
     echo "Installing openpilot Python dependencies..."
     ./tools/install_python_dependencies.sh
     
