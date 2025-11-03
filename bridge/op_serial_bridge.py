@@ -22,7 +22,9 @@ try:
     if platform.machine() == 'armv7l':
         print("⚠️  Detected ARMv7 (32-bit ARM) - openpilot not supported")
         print("   Using mock cereal for Pi 2 testing")
-        import bridge.mock_cereal_messaging as messaging
+        # Import from same directory
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        import mock_cereal_messaging as messaging
     else:
         print(f"DEBUG: sys.path = {sys.path[:3]}...")
         print(f"DEBUG: PYTHONPATH = {os.environ.get('PYTHONPATH', 'NOT SET')}")
