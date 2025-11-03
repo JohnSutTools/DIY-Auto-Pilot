@@ -31,8 +31,16 @@ class OpenpilotSteeringSystem:
         
         print(f"✓ Using openpilot at: {self.openpilot_path}")
         
-        # Add openpilot to PYTHONPATH
-        os.environ['PYTHONPATH'] = f"{self.openpilot_path}:{os.environ.get('PYTHONPATH', '')}"
+        # Setup environment for all processes
+        self.env = os.environ.copy()
+        
+        # Add openpilot to PYTHONPATH - THIS IS CRITICAL
+        pythonpath = str(self.openpilot_path)
+        if 'PYTHONPATH' in self.env:
+            pythonpath = f"{pythonpath}:{self.env['PYTHONPATH']}"
+        self.env['PYTHONPATH'] = pythonpath
+        
+        print(f"✓ PYTHONPATH set to: {pythonpath}")
         
     def _find_openpilot(self) -> Path:
         """Find openpilot installation"""
@@ -52,7 +60,8 @@ class OpenpilotSteeringSystem:
         """Start openpilot with webcam support"""
         print("\n🚗 Starting openpilot...")
         
-        env = os.environ.copy()
+        # Use our configured environment
+        env = self.env.copy()
         
         # Enable webcam mode (for USB camera)
         env['USE_WEBCAM'] = '1'
@@ -96,12 +105,13 @@ class OpenpilotSteeringSystem:
         
         print(f"  Using bridge at: {bridge_path}")
         
-        # Create environment with PYTHONPATH for cereal
-        env = os.environ.copy()
+        # CRITICAL: Use the environment with PYTHONPATH set
+        # This is inherited from self.env which already has openpilot in PYTHONPATH
         
         proc = subprocess.Popen(
             [sys.executable, str(bridge_path), "--config", self.config_path, "--debug"],
-            env=env,  # Pass environment with PYTHONPATH
+            env=self.env,  # Pass environment with PYTHONPATH to openpilot
+            cwd=str(project_root),  # Set working directory
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             text=True,
