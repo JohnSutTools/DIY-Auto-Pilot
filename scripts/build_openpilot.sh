@@ -4,12 +4,25 @@
 set -e
 
 echo "==========================================="
-echo "Installing Openpilot Dependencies"
-echo "==========================================g="
+echo "Installing System Dependencies"
+echo "==========================================="
+
+# Install system libraries needed for openpilot Python packages
+echo "Installing required system libraries..."
+sudo apt-get update
+sudo apt-get install -y portaudio19-dev python3-pyaudio
+
+echo ""
+echo "✓ System dependencies installed!"
+
+echo ""
+echo "==========================================="
+echo "Installing Openpilot Python Dependencies"
+echo "==========================================="
 
 cd ~/openpilot
 
-# Install Python dependencies first
+# Install Python dependencies
 echo "Installing Python dependencies (this may take a few minutes)..."
 ./tools/install_python_dependencies.sh
 
