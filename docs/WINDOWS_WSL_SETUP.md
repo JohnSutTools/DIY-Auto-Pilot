@@ -11,6 +11,10 @@ You can run the complete system on Windows using WSL2 (Windows Subsystem for Lin
 
 ---
 
+## UPDATE REPO
+cd ~/steering-actuator
+git pull origin main
+
 ## Step 1: Install WSL2 with Ubuntu
 
 ### Option A: Automatic (Windows 11 or Win10 22H2+)

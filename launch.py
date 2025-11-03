@@ -86,7 +86,15 @@ class OpenpilotSteeringSystem:
         """Start the steering bridge"""
         print("\n🔌 Starting steering bridge...")
         
-        bridge_path = Path(__file__).parent.parent / "bridge" / "op_serial_bridge.py"
+        # Get the correct path relative to this script
+        project_root = Path(__file__).parent
+        bridge_path = project_root / "bridge" / "op_serial_bridge.py"
+        
+        if not bridge_path.exists():
+            print(f"ERROR: Bridge script not found at {bridge_path}")
+            sys.exit(1)
+        
+        print(f"  Using bridge at: {bridge_path}")
         
         proc = subprocess.Popen(
             [sys.executable, str(bridge_path), "--config", self.config_path, "--debug"],
@@ -164,10 +172,15 @@ def main():
     parser = argparse.ArgumentParser(
         description='Launch complete openpilot steering system'
     )
+    
+    # Get project root directory
+    project_root = Path(__file__).parent
+    default_config = project_root / "bridge" / "config.yaml"
+    
     parser.add_argument(
         '--config',
         type=str,
-        default='bridge/config.yaml',
+        default=str(default_config),
         help='Bridge configuration file'
     )
     parser.add_argument(
@@ -181,6 +194,8 @@ def main():
     # Check config exists
     if not os.path.exists(args.config):
         print(f"ERROR: Config file not found: {args.config}")
+        print(f"Expected at: {args.config}")
+        print(f"\nProject root: {project_root}")
         sys.exit(1)
     
     # Create and run system
