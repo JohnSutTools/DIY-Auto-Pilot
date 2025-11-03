@@ -1,14 +1,27 @@
 #!/bin/bash
-# Quick fix script - builds openpilot and tests the environment
+# Quick fix script - installs dependencies, builds openpilot and tests the environment
 
 set -e
 
+echo "==========================================="
+echo "Installing Openpilot Dependencies"
+echo "==========================================="
+
+cd ~/openpilot
+
+# Install Python dependencies first
+echo "Installing Python dependencies (this may take a few minutes)..."
+./tools/install_python_dependencies.sh
+
+echo ""
+echo "✓ Python dependencies installed!"
+
+echo ""
 echo "==========================================="
 echo "Building Openpilot"
 echo "==========================================="
 
 # Build openpilot
-cd ~/openpilot
 echo "Building openpilot (this takes 10-15 minutes)..."
 scons -j$(nproc)
 

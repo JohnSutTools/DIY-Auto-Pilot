@@ -70,6 +70,9 @@ if [ -d "$OPENPILOT_DIR" ]; then
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         cd "$OPENPILOT_DIR"
         git pull
+        echo "Installing/updating Python dependencies..."
+        ./tools/install_python_dependencies.sh
+        echo "Building..."
         scons -j$(nproc)
     fi
 else
@@ -80,6 +83,11 @@ else
     cd openpilot
     git checkout release3
     
+    echo ""
+    echo "Installing openpilot Python dependencies..."
+    ./tools/install_python_dependencies.sh
+    
+    echo ""
     echo "Building openpilot (this takes 10-30 minutes)..."
     scons -j$(nproc)
 fi
