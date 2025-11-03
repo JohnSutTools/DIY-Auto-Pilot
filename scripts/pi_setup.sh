@@ -150,11 +150,27 @@ fi
 git lfs install
 git lfs pull || echo "Git LFS pull failed, some files may be missing"
 
+# Fix openpilot setup script for Debian 13 (Trixie) compatibility
+echo ""
+echo "Applying Debian 13 compatibility fixes..."
+if [ -f "tools/ubuntu_setup.sh" ]; then
+    # Backup original
+    if [ ! -f "tools/ubuntu_setup.sh.original" ]; then
+        cp tools/ubuntu_setup.sh tools/ubuntu_setup.sh.original
+    fi
+    
+    # Fix package names for Debian 13
+    sed -i 's/libglib2.0-0 /libglib2.0-0t64 /g' tools/ubuntu_setup.sh
+    sed -i 's/libglib2.0-0$/libglib2.0-0t64/g' tools/ubuntu_setup.sh
+    sed -i 's/libncurses5-dev/libncurses-dev/g' tools/ubuntu_setup.sh
+    echo "✓ Package names updated for Debian 13"
+fi
+
 # Run official setup script
 echo ""
 echo "Running openpilot ubuntu_setup.sh..."
 if [ -f "tools/ubuntu_setup.sh" ]; then
-    ./tools/ubuntu_setup.sh
+    ./tools/ubuntu_setup.sh || echo "Warning: ubuntu_setup.sh had errors, continuing..."
 else
     echo "Warning: ubuntu_setup.sh not found, skipping"
 fi
