@@ -4,7 +4,13 @@
 
 Bridge openpilot's lateral control to an external steering motor for a 2018 Honda Civic RS.
 
-➡️ **New to this project? Start with [`QUICKSTART.md`](QUICKSTART.md)**
+## 🚀 Start Here
+
+**Choose your path:**
+
+- 🎬 **Just want to SEE it?** → [`VISUAL_DEMO.md`](VISUAL_DEMO.md) - *2-minute demo, no hardware needed!*
+- 🏃 **Ready to build?** → [`QUICKSTART.md`](QUICKSTART.md) - *Daily usage guide*
+- 📚 **Need setup help?** → [`docs/UBUNTU_SETUP.md`](docs/UBUNTU_SETUP.md) - *Complete walkthrough*
 
 ## System Overview
 
