@@ -1,0 +1,192 @@
+#!/usr/bin/env python3
+"""
+Unified launcher for openpilot + steering actuator bridge
+Starts everything as a single integrated system
+"""
+
+import os
+import sys
+import signal
+import subprocess
+import time
+import argparse
+from pathlib import Path
+
+class OpenpilotSteeringSystem:
+    def __init__(self, config_path: str, openpilot_path: str = None):
+        self.config_path = config_path
+        self.processes = []
+        
+        # Find openpilot
+        if openpilot_path:
+            self.openpilot_path = Path(openpilot_path)
+        else:
+            self.openpilot_path = self._find_openpilot()
+        
+        if not self.openpilot_path or not self.openpilot_path.exists():
+            print("ERROR: openpilot not found!")
+            print("\nRun setup first:")
+            print("  ./scripts/setup_system.sh")
+            sys.exit(1)
+        
+        print(f"✓ Using openpilot at: {self.openpilot_path}")
+        
+        # Add openpilot to PYTHONPATH
+        os.environ['PYTHONPATH'] = f"{self.openpilot_path}:{os.environ.get('PYTHONPATH', '')}"
+        
+    def _find_openpilot(self) -> Path:
+        """Find openpilot installation"""
+        possible_paths = [
+            Path.home() / "openpilot",
+            Path(__file__).parent.parent / "openpilot",
+            Path("/data/openpilot"),
+        ]
+        
+        for path in possible_paths:
+            if path.exists() and (path / "launch_openpilot.sh").exists():
+                return path
+        
+        return None
+    
+    def start_openpilot(self):
+        """Start openpilot with webcam support"""
+        print("\n🚗 Starting openpilot...")
+        
+        env = os.environ.copy()
+        
+        # Enable webcam mode (for USB camera)
+        env['USE_WEBCAM'] = '1'
+        
+        # LKAS only mode (disable longitudinal control)
+        env['DISABLE_LONGITUDINAL'] = '1'
+        
+        # Start openpilot
+        op_cmd = [str(self.openpilot_path / "launch_openpilot.sh")]
+        
+        proc = subprocess.Popen(
+            op_cmd,
+            cwd=str(self.openpilot_path),
+            env=env,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+            bufsize=1
+        )
+        
+        self.processes.append(("openpilot", proc))
+        print("✓ Openpilot started")
+        
+        # Wait for openpilot to initialize
+        print("  Waiting for openpilot to initialize (10s)...")
+        time.sleep(10)
+        
+        return proc
+    
+    def start_bridge(self):
+        """Start the steering bridge"""
+        print("\n🔌 Starting steering bridge...")
+        
+        bridge_path = Path(__file__).parent.parent / "bridge" / "op_serial_bridge.py"
+        
+        proc = subprocess.Popen(
+            [sys.executable, str(bridge_path), "--config", self.config_path, "--debug"],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+            bufsize=1
+        )
+        
+        self.processes.append(("bridge", proc))
+        print("✓ Bridge started")
+        
+        return proc
+    
+    def monitor_processes(self):
+        """Monitor all processes and stream output"""
+        print("\n" + "="*60)
+        print("System running - Press Ctrl+C to stop")
+        print("="*60 + "\n")
+        
+        try:
+            while True:
+                for name, proc in self.processes:
+                    # Check if process is still running
+                    if proc.poll() is not None:
+                        print(f"\n⚠️  {name} exited with code {proc.returncode}")
+                        self.shutdown()
+                        sys.exit(1)
+                    
+                    # Read output (non-blocking)
+                    if proc.stdout:
+                        line = proc.stdout.readline()
+                        if line:
+                            print(f"[{name}] {line.rstrip()}")
+                
+                time.sleep(0.1)
+                
+        except KeyboardInterrupt:
+            print("\n\n🛑 Shutdown requested...")
+            self.shutdown()
+    
+    def shutdown(self):
+        """Gracefully shutdown all processes"""
+        print("\nStopping all processes...")
+        
+        for name, proc in reversed(self.processes):
+            if proc.poll() is None:  # Still running
+                print(f"  Stopping {name}...")
+                proc.terminate()
+                try:
+                    proc.wait(timeout=5)
+                except subprocess.TimeoutExpired:
+                    print(f"  Force killing {name}...")
+                    proc.kill()
+        
+        print("✓ All processes stopped")
+    
+    def run(self):
+        """Run the complete system"""
+        print("\n" + "="*60)
+        print("Openpilot Steering Actuator System")
+        print("="*60)
+        
+        # Start openpilot
+        self.start_openpilot()
+        
+        # Start bridge
+        self.start_bridge()
+        
+        # Monitor
+        self.monitor_processes()
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description='Launch complete openpilot steering system'
+    )
+    parser.add_argument(
+        '--config',
+        type=str,
+        default='bridge/config.yaml',
+        help='Bridge configuration file'
+    )
+    parser.add_argument(
+        '--openpilot-path',
+        type=str,
+        help='Path to openpilot installation (auto-detected if not specified)'
+    )
+    
+    args = parser.parse_args()
+    
+    # Check config exists
+    if not os.path.exists(args.config):
+        print(f"ERROR: Config file not found: {args.config}")
+        sys.exit(1)
+    
+    # Create and run system
+    system = OpenpilotSteeringSystem(args.config, args.openpilot_path)
+    system.run()
+
+
+if __name__ == '__main__':
+    main()

@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+*.egg-info/
+dist/
+build/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project specific
+*.log
+*.bak
+
+# Serial port lock files
+/dev/ttyUSB*
+/dev/ttyACM*
+
+# Test data
+test_routes/
+replay_data/
+
+# Calibration backups
+bridge/config.yaml.bak
+bridge/*.bak
