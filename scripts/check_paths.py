@@ -19,8 +19,8 @@ script_path = Path(__file__).resolve()
 print(f"\n2. This script location: {script_path}")
 print(f"   Parent directory: {script_path.parent}")
 
-# Project structure
-project_root = script_path.parent
+# Project structure (go up one more level since we're in scripts/)
+project_root = script_path.parent.parent
 print(f"\n3. Project root: {project_root}")
 
 # Check key files
