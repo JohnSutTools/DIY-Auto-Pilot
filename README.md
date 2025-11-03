@@ -46,6 +46,27 @@ USB Webcam → Openpilot (LKAS only)
 - **Power**: 12V (from vehicle battery, fused)
 - **Vehicle**: 2018 Honda Civic RS (LKAS compatible)
 
+## Fresh Ubuntu Install? Start Here!
+
+**Option 1: Automatic (Recommended)**
+```bash
+curl -fsSL https://raw.githubusercontent.com/JohnSutTools/DIY-Auto-Pilot/main/scripts/ubuntu_quick_setup.sh | bash
+```
+
+**Option 2: Manual**
+```bash
+git clone https://github.com/JohnSutTools/DIY-Auto-Pilot.git ~/steering-actuator
+cd ~/steering-actuator
+./scripts/setup_system.sh
+```
+
+**Then test in simulation (no hardware needed):**
+```bash
+./scripts/test_simulation.sh  # Select option 2
+```
+
+➡️ **See [`docs/UBUNTU_SETUP.md`](docs/UBUNTU_SETUP.md) for complete walkthrough**
+
 ## One-Command Setup
 
 ```bash
