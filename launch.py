@@ -32,15 +32,19 @@ class OpenpilotSteeringSystem:
         print(f"✓ Using openpilot at: {self.openpilot_path}")
         
         # Setup environment for all processes
-        self.env = os.environ.copy()
+        # Start fresh to avoid Windows/WSL path pollution
+        self.env = {}
+        
+        # Copy essential environment variables
+        essential_vars = ['PATH', 'HOME', 'USER', 'SHELL', 'TERM', 'LANG', 'LC_ALL']
+        for var in essential_vars:
+            if var in os.environ:
+                self.env[var] = os.environ[var]
         
         # Add openpilot to PYTHONPATH - THIS IS CRITICAL
-        pythonpath = str(self.openpilot_path)
-        if 'PYTHONPATH' in self.env:
-            pythonpath = f"{pythonpath}:{self.env['PYTHONPATH']}"
-        self.env['PYTHONPATH'] = pythonpath
+        self.env['PYTHONPATH'] = str(self.openpilot_path)
         
-        print(f"✓ PYTHONPATH set to: {pythonpath}")
+        print(f"✓ PYTHONPATH set to: {self.env['PYTHONPATH']}")
         
     def _find_openpilot(self) -> Path:
         """Find openpilot installation"""
@@ -105,11 +109,18 @@ class OpenpilotSteeringSystem:
         
         print(f"  Using bridge at: {bridge_path}")
         
-        # CRITICAL: Use the environment with PYTHONPATH set
-        # This is inherited from self.env which already has openpilot in PYTHONPATH
+        # Use openpilot's venv Python to ensure cereal is available
+        venv_python = self.openpilot_path / ".venv" / "bin" / "python"
+        if not venv_python.exists():
+            print(f"ERROR: Openpilot venv not found at {venv_python}")
+            sys.exit(1)
+        
+        # CRITICAL: Use openpilot's Python and environment with PYTHONPATH set
+        print(f"  Using Python: {venv_python}")
+        print(f"  PYTHONPATH: {self.env.get('PYTHONPATH', 'NOT SET')}")
         
         proc = subprocess.Popen(
-            [sys.executable, str(bridge_path), "--config", self.config_path, "--debug"],
+            [str(venv_python), str(bridge_path), "--config", self.config_path, "--debug"],
             env=self.env,  # Pass environment with PYTHONPATH to openpilot
             cwd=str(project_root),  # Set working directory
             stdout=subprocess.PIPE,

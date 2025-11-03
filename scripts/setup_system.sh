@@ -70,9 +70,11 @@ if [ -d "$OPENPILOT_DIR" ]; then
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         cd "$OPENPILOT_DIR"
         git pull
-        echo "Installing/updating Python dependencies..."
-        ./tools/install_python_dependencies.sh
+        git submodule update --init --recursive
+        echo "Running Ubuntu setup..."
+        ./tools/ubuntu_setup.sh
         echo "Building..."
+        source .venv/bin/activate
         scons -j$(nproc)
     fi
 else
@@ -84,15 +86,21 @@ else
     git checkout release3
     
     echo ""
-    echo "Initializing submodules (rednose, panda, opendbc)..."
+    echo "Setting up Git LFS and downloading large files..."
+    git lfs install
+    git lfs pull
+    
+    echo ""
+    echo "Initializing submodules..."
     git submodule update --init --recursive
     
     echo ""
-    echo "Installing openpilot Python dependencies..."
-    ./tools/install_python_dependencies.sh
+    echo "Running openpilot's Ubuntu setup..."
+    ./tools/ubuntu_setup.sh
     
     echo ""
     echo "Building openpilot (this takes 10-30 minutes)..."
+    source .venv/bin/activate
     scons -j$(nproc)
 fi
 

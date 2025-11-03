@@ -3,6 +3,7 @@
 # Serial port settings
 serial_port: /dev/ttyUSB0 # ESP32 device path (Linux: /dev/ttyUSBx, /dev/ttyACMx)
 baud_rate: 115200 # Match ESP32 firmware
+mock_mode: true # Set to true to run without hardware (simulation mode)
 
 # PWM scaling
 pwm_scale: 150 # Multiplier: steer [-1..1] -> PWM [-150..150]

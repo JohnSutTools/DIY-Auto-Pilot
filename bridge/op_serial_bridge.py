@@ -15,9 +15,15 @@ import yaml
 
 # Openpilot imports
 try:
+    import os
+    print(f"DEBUG: sys.path = {sys.path[:3]}...")
+    print(f"DEBUG: PYTHONPATH = {os.environ.get('PYTHONPATH', 'NOT SET')}")
     import cereal.messaging as messaging
-except ImportError:
-    print("ERROR: cereal not found. Install openpilot or cereal library.")
+    print("DEBUG: cereal imported successfully!")
+except ImportError as e:
+    print(f"ERROR: cereal not found. Install openpilot or cereal library.")
+    print(f"DEBUG: Import error: {e}")
+    print(f"DEBUG: sys.path = {sys.path}")
     sys.exit(1)
 
 
@@ -62,14 +68,19 @@ class OpenpilotSerialBridge:
             config.setdefault('pwm_cap', 255)
             config.setdefault('stream_hz', 20)
             config.setdefault('serial_port', '/dev/ttyUSB0')
+            config.setdefault('mock_mode', False)
             
             return config
         except Exception as e:
             print(f"ERROR loading config: {e}")
             sys.exit(1)
     
-    def _init_serial(self) -> serial.Serial:
+    def _init_serial(self) -> Optional[serial.Serial]:
         """Initialize serial connection to ESP32"""
+        if self.config.get('mock_mode', False):
+            self.logger.warning("🔧 MOCK MODE: Running without hardware")
+            return None
+            
         try:
             ser = serial.Serial(
                 port=self.config['serial_port'],
@@ -96,6 +107,12 @@ class OpenpilotSerialBridge:
         # Format command
         command = f"S:{pwm_value:+d}\n"
         
+        # Mock mode - just log
+        if self.serial_port is None:
+            if self.debug:
+                self.logger.debug(f"MOCK: {command.strip()}")
+            return
+        
         try:
             self.serial_port.write(command.encode('utf-8'))
             
@@ -114,6 +131,10 @@ class OpenpilotSerialBridge:
     
     def _emergency_stop(self):
         """Send emergency stop command"""
+        if self.serial_port is None:
+            self.logger.warning("MOCK: Emergency STOP")
+            return
+            
         try:
             self.serial_port.write(b"STOP\n")
             self.logger.warning("Emergency STOP sent")
@@ -124,17 +145,24 @@ class OpenpilotSerialBridge:
         """Extract steering command from openpilot messages"""
         self.sm.update(0)  # Non-blocking update
         
-        # Priority 1: carControl.actuators.steer
+        # Priority 1: carControl.actuators.torque (normalized -1 to +1)
         if self.sm.updated['carControl']:
             cc = self.sm['carControl']
-            if hasattr(cc, 'actuators') and hasattr(cc.actuators, 'steer'):
-                return float(cc.actuators.steer)
+            if hasattr(cc, 'actuators'):
+                # Try torque first (most common for lateral control)
+                if hasattr(cc.actuators, 'torque'):
+                    return float(cc.actuators.torque)
+                # Fallback to steeringAngleDeg if available
+                elif hasattr(cc.actuators, 'steeringAngleDeg'):
+                    # Normalize to -1..+1 (assume ±180 deg range)
+                    return float(cc.actuators.steeringAngleDeg) / 180.0
         
-        # Priority 2: controlsState.steer (fallback)
+        # Priority 2: controlsState.lateralControlState.steeringAngleDeg (fallback)
         if self.sm.updated['controlsState']:
             cs = self.sm['controlsState']
-            if hasattr(cs, 'steer'):
-                return float(cs.steer)
+            if hasattr(cs, 'lateralControlState'):
+                if hasattr(cs.lateralControlState, 'steeringAngleDeg'):
+                    return float(cs.lateralControlState.steeringAngleDeg) / 180.0
         
         return None
     

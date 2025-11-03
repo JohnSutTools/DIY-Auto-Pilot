@@ -1,62 +1,14 @@
 #!/bin/bash
-# Quick fix script - installs dependencies, builds openpilot and tests the environment
+# This script is deprecated - use install.sh instead
+# Kept for reference only
 
-set -e
-
-echo "==========================================="
-echo "Installing System Dependencies"
-echo "==========================================="
-
-# Install system libraries needed for openpilot Python packages
-echo "Installing required system libraries..."
-sudo apt-get update
-sudo apt-get install -y portaudio19-dev python3-pyaudio
-
+echo "ERROR: This script is deprecated."
 echo ""
-echo "✓ System dependencies installed!"
-
+echo "Use the proper installation script instead:"
+echo "  cd ~/steering-actuator"
+echo "  ./scripts/install.sh"
 echo ""
-echo "==========================================="
-echo "Initializing Openpilot Submodules"
-echo "==========================================="
-
-cd ~/openpilot
-
-# Initialize git submodules (rednose, panda, opendbc, etc.)
-echo "Initializing git submodules (rednose, panda, etc.)..."
-git submodule update --init --recursive
-
-echo ""
-echo "✓ Submodules initialized!"
-
-echo ""
-echo "==========================================="
-echo "Installing Openpilot Python Dependencies"
-echo "==========================================="
-
-# Install Python dependencies
-echo "Installing Python dependencies (this may take a few minutes)..."
-./tools/install_python_dependencies.sh
-
-echo ""
-echo "✓ Python dependencies installed!"
-
-echo ""
-echo "==========================================="
-echo "Building Openpilot"
-echo "==========================================="
-
-# Activate the virtual environment that was just created
-echo "Activating openpilot virtual environment..."
-source .venv/bin/activate
-
-# Verify we're using the right Python
-echo "Using Python: $(which python3)"
-echo "Python version: $(python3 --version)"
-
-# Build openpilot
-echo "Building openpilot (this takes 10-15 minutes)..."
-scons -j$(nproc)
+exit 1
 
 echo ""
 echo "✓ Openpilot build complete!"
