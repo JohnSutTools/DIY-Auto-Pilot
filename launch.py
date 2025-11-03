@@ -96,8 +96,12 @@ class OpenpilotSteeringSystem:
         
         print(f"  Using bridge at: {bridge_path}")
         
+        # Create environment with PYTHONPATH for cereal
+        env = os.environ.copy()
+        
         proc = subprocess.Popen(
             [sys.executable, str(bridge_path), "--config", self.config_path, "--debug"],
+            env=env,  # Pass environment with PYTHONPATH
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             text=True,
