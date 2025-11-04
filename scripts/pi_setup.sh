@@ -153,17 +153,17 @@ git lfs pull || echo "Git LFS pull failed, some files may be missing"
 # Fix openpilot setup script for Debian 13 (Trixie) compatibility
 echo ""
 echo "Applying Debian 13 compatibility fixes..."
-if [ -f "tools/ubuntu_setup.sh" ]; then
+if [ -f "tools/install_ubuntu_dependencies.sh" ]; then
     # Backup original
-    if [ ! -f "tools/ubuntu_setup.sh.original" ]; then
-        cp tools/ubuntu_setup.sh tools/ubuntu_setup.sh.original
+    if [ ! -f "tools/install_ubuntu_dependencies.sh.original" ]; then
+        cp tools/install_ubuntu_dependencies.sh tools/install_ubuntu_dependencies.sh.original
     fi
     
-    # Fix package names for Debian 13
-    sed -i 's/libglib2.0-0 /libglib2.0-0t64 /g' tools/ubuntu_setup.sh
-    sed -i 's/libglib2.0-0$/libglib2.0-0t64/g' tools/ubuntu_setup.sh
-    sed -i 's/libncurses5-dev/libncurses-dev/g' tools/ubuntu_setup.sh
-    echo "✓ Package names updated for Debian 13"
+    # Fix package names for Debian 13 (t64 suffix and ncurses)
+    sed -i 's/libglib2\.0-0 /libglib2.0-0t64 /g' tools/install_ubuntu_dependencies.sh
+    sed -i 's/libglib2\.0-0$/libglib2.0-0t64/g' tools/install_ubuntu_dependencies.sh
+    sed -i 's/libncurses5-dev/libncurses-dev/g' tools/install_ubuntu_dependencies.sh
+    echo "✓ Package names updated for Debian 13 in install_ubuntu_dependencies.sh"
 fi
 
 # Run official setup script
