@@ -2,9 +2,11 @@
 """Test what the camera is actually seeing"""
 import cv2
 import numpy as np
+import sys
 
-print("Opening camera /dev/video0...")
-cap = cv2.VideoCapture('/dev/video0')
+camera_id = int(sys.argv[1]) if len(sys.argv) > 1 else 0
+print(f"Opening camera /dev/video{camera_id}...")
+cap = cv2.VideoCapture(camera_id)
 cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*'MJPG'))
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)

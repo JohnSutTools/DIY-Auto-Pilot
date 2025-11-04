@@ -3,6 +3,12 @@
 ## Project Architecture
 
 **Goal**: Unified LKAS system running openpilot + steering bridge on laptop/Raspberry Pi with USB webcam.
+Memory locked:
+
+All openpilot and DIY-Auto-Pilot code is LOCAL in: c:\Users\John\OneDrive - Sutton Tools Pty Ltd\Private\DIY Auto Pilot\
+Research/read code locally from Windows filesystem
+After making changes, SCP files to VM at user@192.168.68.115
+Execute everything via SSH on the VM
 
 **Signal flow**: `USB webcam -> openpilot (LKAS) -> Python bridge -> ESP32-S3 -> BTS7960 -> motor`
 

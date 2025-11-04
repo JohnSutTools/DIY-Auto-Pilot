@@ -1,0 +1,23 @@
+# Openpilot Serial Bridge Configuration
+
+# Serial port settings
+serial_port: /dev/ttyUSB0 # ESP32 device path (Linux: /dev/ttyUSBx, /dev/ttyACMx)
+baud_rate: 115200 # Match ESP32 firmware
+mock_mode: true # Set to true to run without hardware (simulation mode)
+
+# PWM scaling
+pwm_scale: 150 # Multiplier: steer [-1..1] -> PWM [-150..150]
+pwm_cap: 255 # Absolute max PWM value (safety limit)
+
+# Update rate
+stream_hz: 20 # Bridge update frequency (10-50 Hz recommended)
+
+# Openpilot connection (optional)
+# openpilot_host: 192.168.43.1  # Uncomment to connect to remote openpilot (e.g., comma device)
+# Leave commented for local openpilot on same machine
+
+# Notes:
+# - Tune pwm_scale to match desired steering authority
+# - Lower values = gentler steering, higher = more aggressive
+# - Start conservative (100-150) and increase as needed
+# - pwm_cap is a hard safety limit enforced by both bridge and firmware
